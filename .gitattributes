@@ -1,0 +1,9 @@
+* text=auto
+
+# Batch files must keep CRLF or cmd.exe misparses labels and blocks.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf

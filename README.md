@@ -1,0 +1,112 @@
+# multiplicity-purge
+
+**Unofficial cleaner for Stardock / EdgeRunner Multiplicity 2, 3 and 4 leftovers.**
+
+Multiplicity's own uninstaller regularly leaves the machine in a half-uninstalled state: the
+service survives, `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Multiplicity` stays behind,
+ProgramData keeps its session data, and the firewall keeps the rules. Windows then refuses to
+reinstall, or the installer insists the product is "already installed".
+
+`purge-multiplicity` removes exactly those leftovers, logs every action, and refuses to touch
+anything else.
+
+```
+        dry run first  ->  confirm  ->  purge  ->  verify  ->  reboot
+```
+
+> **Not affiliated with Stardock or EdgeRunner.** "Multiplicity" is a trademark of its respective
+> owner. This is an independent cleanup utility for people who already decided to uninstall.
+
+---
+
+## Quick start
+
+```cmd
+:: 1. See exactly what would be removed. Changes nothing. No admin needed.
+purge-multiplicity.bat --dry-run
+
+:: 2. Run it (asks for confirmation, then self-elevates)
+purge-multiplicity.bat
+
+:: 3. Unattended, e.g. from a provisioning script
+purge-multiplicity.bat --yes --no-reboot --log C:\logs\mp-purge.log
+```
+
+Requirements: Windows 10/11, `cmd.exe`. Admin rights for a live run (the script re-launches
+itself elevated through UAC). A dry run needs no rights at all.
+
+## Options
+
+| Option | Effect |
+|---|---|
+| `--dry-run`, `-n` | Print every action as `would ...`, change nothing. Structurally safe — each action passes through a guarded helper. |
+| `--yes`, `-y` | Skip the interactive `PURGE` confirmation (for scripting). |
+| `--no-pause` | Do not wait for a keypress at the end. |
+| `--no-reboot` | Do not offer the reboot at the end. |
+| `--log PATH` | Write the log elsewhere (default `%TEMP%\purge-multiplicity.log`). |
+| `--help`, `-h` | Usage. |
+
+Exit codes: `0` success · `1` aborted by you · `2` elevation refused · `3` at least one action failed.
+
+## What it removes
+
+| Category | Detail |
+|---|---|
+| **Services** | `SDMultiplicityService`, `Multiplicity`, `MultiSrv`, `MultiSrv64`, `SdDisplay` — stopped, then deleted. |
+| **Processes** | `multipl.exe`, `multipl2.exe`, `MultiPLV64.exe`, `MP2Drag.exe`, `MP2Control.exe`, `MPBar.exe`, `MultiplicityConfig.exe`, `MultiSrv.exe`, `MultiSrv64.exe`, `MPRDP64.exe`, `SdDisplay.exe`, `DeElevate64.exe`, `Multiplicity.exe`. |
+| **Scheduled tasks** | Any task whose name contains `Multiplicity`. |
+| **Legacy uninstallers** | `Multisrv64.exe -uninstall` / `Multisrv.exe -uninstall` under EdgeRunner and Stardock install roots, if present. |
+| **Directories** | The Multiplicity folders under `Program Files`, `Program Files (x86)`, `ProgramData`, `%LOCALAPPDATA%` and `%APPDATA%` — across the MP2/MP3/MP4 layouts. |
+| **Registry** | Multiplicity's own keys: the `Stardock\Multiplicity*` subtree entries, the `Uninstall` entries, and the service keys under `CurrentControlSet\Services`. |
+| **Firewall** | The 14 known Multiplicity rule names. |
+
+Full detail, including what is deliberately **not** touched: [docs/removal-map.md](docs/removal-map.md).
+
+## Safety design
+
+The script is not "careful by vibes" — it is careful by construction:
+
+1. **One choke point.** Every mutation goes through a helper (`:StopService`, `:RmDir`, `:RegDel`,
+   `:DelFirewall`, …). Each helper begins with the dry-run guard, so a dry run cannot mutate.
+2. **Verify, don't assume.** Deletions are confirmed afterwards (`if exist`, `sc query`,
+   `reg query`); failures are counted, not swallowed.
+3. **Nothing is deleted by pattern.** No registry wildcards, no `rmdir` on a parent of unrelated
+   software. The only wildcard is the `Registrations\mp*.bin` cleanup inside Multiplicity's own
+   ProgramData folder.
+4. **Confirmation by typing `PURGE`.** A stray Enter does nothing.
+5. **Log first, always.** `%TEMP%\purge-multiplicity.log` with a timestamp per action.
+
+**No undo.** Make a restore point (`SystemPropertiesProtection.exe`) or a VM snapshot first if the
+machine matters. The script is written to be readable precisely so you can audit it before running
+it — it is ~500 lines of batch, and every destructive line is on the same line as its guard.
+
+## Verification
+
+Tested against a live Windows install with Multiplicity 4 still present:
+
+```
+[1/9] Stopping services...        would stop service Multiplicity
+[2/9] Ending processes...         would kill process MP2Drag.exe, MultiplicityConfig.exe, MultiSrv64.exe
+[3/9] Removing scheduled tasks... (none matched — the CSV parse keeps task paths intact)
+[6/9] Removing directories...     Program Files (x86)\Stardock\Multiplicity, ProgramData\Stardock\MP2, ...
+[9/9] Verifying leftovers...      service Multiplicity ... leftover
+Actions that WOULD run: 22   Skipped: 87   Would fail: 0
+```
+
+A `--dry-run` on your machine should produce a short, plausible list. If it ever lists a scheduled
+task or a directory that has nothing to do with Multiplicity, **stop and open an issue** — that is a
+bug, not a quirk.
+
+## Development
+
+Single-file batch, on purpose: it must run on a machine where nothing is installed.
+
+- Keep the file **ASCII-only** and **CRLF** line endings. Both are enforced in CI
+  (`.github/workflows/lint.yml`) because cmd.exe misparses LF-only batch files.
+- Keep every mutation inside a helper that has the `%DRY%` guard.
+- Prefer `if ... goto` over multi-line `if ( ... ) else ( ... )` — nested blocks in cmd are a
+  reliable source of silent misbehaviour.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright (c) 2026 miztizm.
