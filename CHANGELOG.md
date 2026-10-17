@@ -3,6 +3,23 @@
 All notable changes to this project. Format: [Keep a Changelog](https://keepachangelog.com/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.2.1] — 2026-10-17
+
+Verified the full install → run → remove cycle against the public repo, and documented what it
+exposed. No code changes.
+
+### Verified
+- `navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity`
+  installs to `<store>/skills/purge-multiplicity` **with the `.bat` payload included**.
+- `navig skill run purge-multiplicity:status` and `:dry-run` execute the payload correctly
+  (25 would-be actions, 98 skipped, 0 failures on the reference machine).
+- `navig install remove purge-multiplicity` deletes the directory cleanly — nothing left in the store.
+
+### Documented
+- **Skills resolve relative to the current navig project, not the global store.** From an arbitrary
+  cwd, `skill run` says `Skill not found` while `navig install list` happily lists it. Pass
+  `--dir <store>/skills` or run inside a navig project. This is now in `navig-skill/README.md`.
+
 ## [2.2.0] — 2026-10-17
 
 NAVIG skill packaging. The tool is unchanged (still 2.1.0); this release adds a tested,

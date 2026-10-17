@@ -50,17 +50,46 @@ python -m navig install add navig-skill/cli-skills/system/purge-multiplicity
 Then:
 
 ```bash
-python -m navig skill list                  # should show purge-multiplicity
-python -m navig skill run purge-multiplicity:status
-python -m navig skill run purge-multiplicity:dry-run
-python -m navig skill run purge-multiplicity:purge   # destructive; prompts first
+STORE="$HOME/.navig/data/store/skills"      # where navig installs skills
+python -m navig skill list --dir "$STORE"   # should show purge-multiplicity
+python -m navig skill run purge-multiplicity:status  --dir "$STORE"
+python -m navig skill run purge-multiplicity:dry-run --dir "$STORE"
+python -m navig skill run purge-multiplicity:purge   --dir "$STORE"   # destructive; prompts first
 ```
 
 Remove it again:
 
 ```bash
-python -m navig install list                # find the exact asset name
 python -m navig install remove purge-multiplicity
+python -m navig install list                # confirm it is gone
+```
+
+> **`--dir` matters.** Skills are resolved relative to the current navig project, *not* the global
+> store, so from an arbitrary directory `skill run` reports `Skill not found` even though
+> `navig install list` shows the asset. Run it inside a navig project, or pass
+> `--dir <store>/skills` as above. This was found by testing the install cycle, not by reading docs.
+
+## Verified install → run → remove cycle
+
+On navig 3.27.1 / Windows 11, against the public repo:
+
+```
+$ python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity
+  > Installed skill 'purge-multiplicity' -> C:\Users\...\.navig\data\store\skills\purge-multiplicity
+
+$ ls <store>/purge-multiplicity
+  SKILL.md   purge-multiplicity.yaml   purge-multiplicity.bat     # payload travelled with it
+
+$ python -m navig skill run purge-multiplicity:status --dir <store>/skills
+  > purge-multiplicity.bat --status
+   version 4.0.7.2 · service RUNNING · role flag Primary=0 · peers: 192.168.1.13:30564 ...
+
+$ python -m navig skill run purge-multiplicity:dry-run --dir <store>/skills
+   Actions that WOULD run: 25   Skipped: 98   Would fail: 0
+
+$ python -m navig install remove purge-multiplicity
+  > Removed 'purge-multiplicity'
+$ test -d <store>/purge-multiplicity    # False — clean removal, nothing left behind
 ```
 
 ## Test it
