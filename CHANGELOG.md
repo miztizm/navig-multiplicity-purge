@@ -3,6 +3,23 @@
 All notable changes to this project. Format: [Keep a Changelog](https://keepachangelog.com/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.2.3] — 2026-10-17
+
+Discoverability. No code change.
+
+### Changed
+- **Repo renamed** `miztizm/multiplicity-purge` → **`miztizm/navig-multiplicity-purge`**, following
+  the NAVIG ecosystem's `navig-*` family (`navig-menu`, `navig-vault`, `navig-blackbox`,
+  `navig-dedupe`, `navig-mini`) so it is findable alongside the other NAVIG tools. GitHub redirects
+  the old URL; the skill id stays `multiplicity-purge` (registry ids carry no prefix).
+- GitHub topics added: `navig`, `navig-run`, `stardock`, `multiplicity`, `uninstaller`, `windows`, `kvm`.
+- Repo description now states that it ships a NAVIG skill.
+- Links to [navig.run](https://navig.run) and the
+  [navig-run registry](https://github.com/navig-run/registry) added to the README,
+  `navig-skill/README.md` and `SKILL.md`.
+- Install spec is now:
+  `github:miztizm/navig-multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge`
+
 ## [2.2.2] — 2026-10-17
 
 Naming consistency. No functional change — the tool is still 2.1.0.
@@ -14,7 +31,7 @@ Naming consistency. No functional change — the tool is still 2.1.0.
 - **Script** `purge-multiplicity.bat` → **`multiplicity-purge.bat`**, together with its internal
   `APP`/`title`/log filename, so no layer keeps the old inverted order.
 - Install spec is now:
-  `github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge`
+  `github:miztizm/navig-multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge`
 
 ### Note
 - The v2.1.0 release asset keeps its original filename `purge-multiplicity.bat`; everything from
@@ -26,7 +43,7 @@ Verified the full install → run → remove cycle against the public repo, and 
 exposed. No code changes.
 
 ### Verified
-- `navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity`
+- `navig skill install github:miztizm/navig-multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity`
   installs to `<store>/skills/purge-multiplicity` **with the `.bat` payload included**.
 - `navig skill run purge-multiplicity:status` and `:dry-run` execute the payload correctly
   (25 would-be actions, 98 skipped, 0 failures on the reference machine).

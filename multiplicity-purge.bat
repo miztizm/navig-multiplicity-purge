@@ -8,7 +8,7 @@ title multiplicity-purge
 ::
 ::  Author : miztizm
 ::  License: MIT
-::  Source : https://github.com/miztizm/multiplicity-purge
+::  Source : https://github.com/miztizm/navig-multiplicity-purge
 ::
 ::  Why this exists: the official uninstaller regularly leaves the service,
 ::  ghost registry keys, firewall rules and ProgramData behind. This removes

@@ -1,6 +1,12 @@
-# multiplicity-purge
+# navig-multiplicity-purge
 
 **Unofficial cleaner for Stardock / EdgeRunner Multiplicity 2, 3 and 4 leftovers.**
+
+> **Part of the [NAVIG](https://navig.run) ecosystem.** This repo ships a
+> [NAVIG](https://navig.run) skill, so the cleaner can be installed and run through the
+> [NAVIG registry](https://github.com/navig-run/registry) — see [navig-skill/](navig-skill/README.md).
+> Naming follows the `navig-*` family (`navig-menu`, `navig-vault`, `navig-dedupe`, …) so it is
+> discoverable alongside the other NAVIG tools.
 
 Multiplicity's own uninstaller regularly leaves the machine in a half-uninstalled state: the
 service survives, `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Multiplicity` stays behind,
@@ -152,7 +158,7 @@ This repo also ships a ready-to-install [NAVIG](https://github.com/navig-run/reg
 registry** — it is packaged here and installable directly from this repo:
 
 ```bash
-python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
+python -m navig skill install github:miztizm/navig-multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
 python -m navig skill run multiplicity-purge:status
 python -m navig install remove multiplicity-purge
 ```

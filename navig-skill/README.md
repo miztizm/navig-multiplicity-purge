@@ -1,5 +1,9 @@
 # NAVIG skill packaging
 
+Part of the [NAVIG](https://navig.run) ecosystem — the operator runtime this packages into, with
+its [registry](https://github.com/navig-run/registry) and the [navig-run](https://github.com/navig-run)
+GitHub org.
+
 This folder holds a **ready-to-submit** [NAVIG](https://github.com/navig-run/registry) skill for
 `multiplicity-purge`, kept here so the tool and its skill packaging cannot drift apart.
 
@@ -41,7 +45,7 @@ survives either path.
 
 ```bash
 # from GitHub (works once the commit is pushed)
-python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
+python -m navig skill install github:miztizm/navig-multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
 
 # or from a local checkout
 python -m navig install add navig-skill/cli-skills/system/multiplicity-purge
@@ -74,7 +78,7 @@ python -m navig install list                # confirm it is gone
 On navig 3.27.1 / Windows 11, against the public repo:
 
 ```
-$ python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
+$ python -m navig skill install github:miztizm/navig-multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
   > Installed skill 'multiplicity-purge' -> C:\Users\...\.navig\data\store\skills\multiplicity-purge
 
 $ ls <store>/multiplicity-purge

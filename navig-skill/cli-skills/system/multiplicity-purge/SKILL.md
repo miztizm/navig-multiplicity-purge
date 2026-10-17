@@ -61,13 +61,14 @@ agent_hints:
 
 # multiplicity-purge
 
-Unofficial cleaner for **Stardock / EdgeRunner Multiplicity 2, 3 and 4** leftovers. Multiplicity's
+Unofficial cleaner for **Stardock / EdgeRunner Multiplicity 2, 3 and 4** leftovers. Packaged for
+[NAVIG](https://navig.run) — the operator runtime this skill installs into. Multiplicity's
 own uninstaller regularly leaves the service running, ghost `CurrentControlSet\Services` keys, an
 installed IDD driver, `ProgramData` session data and per-feature firewall rules — which is why a
 reinstall can claim the product is still there.
 
 Full product notes, the port map and the reasons residue survives:
-<https://github.com/miztizm/multiplicity-purge/blob/main/docs/background.md>
+<https://github.com/miztizm/navig-multiplicity-purge/blob/main/docs/background.md>
 
 ## Commands
 
