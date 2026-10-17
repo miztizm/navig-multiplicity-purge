@@ -17,9 +17,14 @@ navig-skill/
 ├── registry-entry.json                            # snippet for cli-skills/registry.json
 └── cli-skills/system/multiplicity-purge/
     ├── SKILL.md                                   # what navig discovers and runs
+    ├── main.py                                    # portable launcher (cwd-independent)
     ├── multiplicity-purge.yaml                    # registry submission form
     └── multiplicity-purge.bat                     # vendored payload (byte-identical to root)
 ```
+
+The repo **root** also carries `SKILL.md`, `main.py` and `multiplicity-purge.bat`, so it doubles as
+a plain Agent Skill folder for agents that are not navig. CI enforces byte-identical copies of all
+three, so the two layouts can never drift.
 
 ## Why a cli-skill, and why this shape
 
@@ -27,7 +32,7 @@ The registry defines **cli-skills** as *"YAML command skills for one tool each (
 network, security, system)"*. A Multiplicity uninstaller is exactly that, so the pillar is
 `cli-skills`, category `system`.
 
-Three details come from reading `core/navig-skill/commands/skills.py` rather than the docs:
+Three details come from reading `core/navig/commands/skills.py` rather than the docs:
 
 | Detail | Consequence here |
 |---|---|

@@ -38,6 +38,10 @@ SKILL_MD = SKILL_DIR / "SKILL.md"
 SKILL_YAML = SKILL_DIR / "multiplicity-purge.yaml"
 PAYLOAD = SKILL_DIR / "multiplicity-purge.bat"
 ROOT_BAT = ROOT / "multiplicity-purge.bat"
+# Repo root doubles as a plain Agent Skill folder so non-navig agents can install it.
+ROOT_SKILL = ROOT / "SKILL.md"
+ROOT_MAIN = ROOT / "main.py"
+PKG_MAIN = SKILL_DIR / "main.py"
 
 VALID_CATEGORIES = {
     "network", "system", "cloud", "docker", "database", "security",
@@ -157,6 +161,18 @@ def static() -> None:
     check(lf == crlf, f"payload line endings are CRLF ({crlf}/{lf})")
     check(b'set "VER=' in raw, "payload declares a version")
 
+    print("\nportable skill folder (repo root, for agents other than navig)")
+    check(ROOT_SKILL.is_file(), "repo root has SKILL.md")
+    check(sha256(ROOT_SKILL) == sha256(SKILL_MD),
+          "root SKILL.md is byte-identical to the packaged one")
+    check(ROOT_MAIN.is_file() and PKG_MAIN.is_file(), "main.py present at root and in the package")
+    check(sha256(ROOT_MAIN) == sha256(PKG_MAIN), "main.py is byte-identical in both places")
+    main_src = ROOT_MAIN.read_text(encoding="utf-8")
+    check("Path(__file__).resolve().parent" in main_src,
+          "main.py resolves the payload relative to itself (cwd-independent)")
+    check('SAFE_DEFAULT = ["--status"]' in main_src,
+          "main.py defaults to the read-only command")
+
 
 def live() -> None:
     print("\nbehavioural check (navig execution model: shell=True, cwd=skill dir)")
@@ -177,6 +193,31 @@ def live() -> None:
     check("role flag" in out.lower(), "report includes the role flag (Primary/Secondary)")
     if "not present" in out.lower():
         print("        note: Multiplicity is not installed on this machine — leftovers-only run")
+
+    # Portability: the launcher must work from a DIFFERENT cwd than the skill folder,
+    # which is the case for any agent that does not use navig's cwd convention.
+    print("\nportability check (main.py run from the repo root, not the skill dir)")
+    cmd = [sys.executable, str(ROOT_MAIN), "--status"]
+    try:
+        proc = subprocess.run(cmd, cwd=str(ROOT), text=True, capture_output=True, timeout=120)
+    except Exception as exc:  # noqa: BLE001
+        bad(f"could not run main.py: {exc}")
+        return
+    out = (proc.stdout or "") + (proc.stderr or "")
+    check(proc.returncode == 0, f"'python main.py --status' exited 0 (got {proc.returncode})")
+    check("role flag" in out.lower(), "launcher found the payload without relying on cwd")
+
+    print("\nportability check (main.py with no args defaults to read-only)")
+    try:
+        proc = subprocess.run([sys.executable, str(ROOT_MAIN)], cwd=str(ROOT),
+                              text=True, capture_output=True, timeout=120)
+    except Exception as exc:  # noqa: BLE001
+        bad(f"could not run bare main.py: {exc}")
+        return
+    out = (proc.stdout or "") + (proc.stderr or "")
+    check(proc.returncode == 0, f"bare 'python main.py' exited 0 (got {proc.returncode})")
+    check("role flag" in out.lower() and "actions that would run" not in out.lower(),
+          "bare invocation stayed read-only (status report, no action list)")
 
 
 def main() -> int:

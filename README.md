@@ -151,17 +151,41 @@ version history, every file and driver an MP4 install places on disk, the port m
 (30564/30565/30567/30568/30569) and the five specific reasons an uninstall leaves residue. Read it
 before a purge on a machine you care about.
 
-## NAVIG skill
+## Install
 
-This repo also ships a ready-to-install [NAVIG](https://github.com/navig-run/registry) skill, so
-`navig` can run the tool as `status` / `dry-run` / `purge`. **It is not submitted to the official
-registry** — it is packaged here and installable directly from this repo:
+Three ways, depending on where you are running it from. The skill is a standard `SKILL.md` folder,
+so it is not navig-specific — the repo root **is** a valid skill.
+
+**1. Any agent that loads `SKILL.md`** (Claude Code, navig, your own harness) — clone or point at
+the repo root:
+
+```bash
+git clone https://github.com/miztizm/navig-multiplicity-purge
+cd navig-multiplicity-purge
+python main.py --status      # the launcher finds the payload itself; cwd does not matter
+```
+
+`main.py` resolves `multiplicity-purge.bat` relative to its own location and defaults to the
+**read-only** `--status`, so a bare invocation can never purge.
+
+**2. NAVIG** (its native packaging, with `status` / `dry-run` / `purge` as skill commands):
 
 ```bash
 python -m navig skill install github:miztizm/navig-multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
-python -m navig skill run multiplicity-purge:status
+python -m navig skill run multiplicity-purge:status --dir ~/.navig/data/store/skills
 python -m navig install remove multiplicity-purge
 ```
+
+**3. No tooling at all** — download the script and run it:
+
+```cmd
+curl -L -o multiplicity-purge.bat https://github.com/miztizm/navig-multiplicity-purge/releases/latest/download/multiplicity-purge.bat
+multiplicity-purge.bat --status
+```
+
+**It is not submitted to the official NAVIG registry** — it is packaged here and installable
+directly from this repo. Windows only (Multiplicity is Windows software); the launcher says so and
+exits cleanly on other platforms.
 
 Packaging notes, the pillar rationale and the three frontmatter spellings navig disagrees with
 itself about: [navig-skill/README.md](navig-skill/README.md).

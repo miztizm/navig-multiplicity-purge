@@ -82,9 +82,26 @@ Full product notes, the port map and the reasons residue survives:
 
 1. **`status` before `purge`, always.** If it reports `PRIMARY` or a connected peer, other machines
    are using this one — purging disconnects them mid-session.
-2. **The payload runs from this directory.** navig executes the command with the skill's own folder
-   as the working directory, so `multiplicity-purge.bat` must sit beside `SKILL.md` (it does — see
-   `multiplicity-purge.bat` in this folder). No network access, nothing to download at run time.
+2. **Windows only.** Multiplicity is Windows software; on any other platform the launcher exits
+   with a clear message instead of doing something surprising.
+
+## Running it in any agent (not just navig)
+
+This file is a standard `SKILL.md`, so any agent that loads skills can use it. The `navig-commands`
+block above is navig-specific sugar; everything below works everywhere, from any working directory:
+
+```bash
+python main.py --status     # default when run with no args — read-only
+python main.py --dry-run    # what a purge would remove; changes nothing
+python main.py --yes        # destructive, non-interactive (prompts are skipped)
+```
+
+`main.py` resolves `multiplicity-purge.bat` **relative to its own location**, so cwd never matters.
+If Python is unavailable, call the batch file directly:
+
+```bat
+multiplicity-purge.bat --status
+```
 
 ## Licence
 

@@ -3,6 +3,32 @@
 All notable changes to this project. Format: [Keep a Changelog](https://keepachangelog.com/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.3.0] — 2026-10-17
+
+Works for anyone, not just navig. No change to the cleaner itself (still 2.1.0).
+
+### Added
+- **`main.py` launcher** — resolves `multiplicity-purge.bat` relative to its own file, so the skill
+  runs from *any* working directory (previously only navig's cwd convention worked). A bare
+  `python main.py` defaults to the read-only `--status`, so it can never purge by accident. Exits
+  cleanly with a message on non-Windows platforms.
+- **`SKILL.md` at the repo root** — the repo root is now itself a valid Agent Skill folder, so
+  agents that are not navig (Claude Code, any SKILL.md loader) can install it by cloning. The
+  packaged copy under `navig-skill/` stays byte-identical, enforced in CI.
+- `SKILL.md` gained a **"Running it in any agent"** section: `python main.py --status|--dry-run|--yes`
+  plus the raw `.bat` fallback, so the instructions make sense outside navig.
+- Tests: root-vs-package byte equality for `SKILL.md`, `main.py` and the payload, plus two live
+  portability assertions (runs from a different cwd; bare invocation stays read-only).
+
+### Changed
+- README install section documents three paths: any SKILL.md agent, NAVIG, and no-tooling.
+- GitHub topics expanded for discovery: `claude-skills`, `agent-skills`, `skills`, `agent-skill`.
+- Static checks 78, live checks 85, all passing.
+
+### Fixed
+- Two docs referenced navig's source as `core/navig-skill/commands/skills.py` — a path rewrite
+  accident during the folder rename. Corrected to `core/navig/commands/skills.py`.
+
 ## [2.2.3] — 2026-10-17
 
 Discoverability. No code change.
