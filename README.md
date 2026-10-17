@@ -145,6 +145,21 @@ version history, every file and driver an MP4 install places on disk, the port m
 (30564/30565/30567/30568/30569) and the five specific reasons an uninstall leaves residue. Read it
 before a purge on a machine you care about.
 
+## NAVIG skill
+
+This repo also ships a ready-to-install [NAVIG](https://github.com/navig-run/registry) skill, so
+`navig` can run the tool as `status` / `dry-run` / `purge`. **It is not submitted to the official
+registry** — it is packaged here and installable directly from this repo:
+
+```bash
+python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity
+python -m navig skill run purge-multiplicity:status
+python -m navig install remove purge-multiplicity
+```
+
+Packaging notes, the pillar rationale and the three frontmatter spellings navig disagrees with
+itself about: [navig-skill/README.md](navig-skill/README.md).
+
 ## Development
 
 Single-file batch, on purpose: it must run on a machine where nothing is installed.

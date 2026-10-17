@@ -1,0 +1,76 @@
+# NAVIG Registry submission form — cli-skills/system/purge-multiplicity.yaml
+#
+# This is the file to PR into github.com/navig-run/registry at
+# `cli-skills/system/purge-multiplicity.yaml`, with `purge-multiplicity.bat`
+# placed beside it.
+#
+# Why a cli-skill: the registry defines cli-skills as "YAML command skills for one
+# tool each (git, docker, network, security, system)". A Multiplicity uninstaller is
+# exactly that. The semantically closer pillar would be `blocks` ("apply an outcome",
+# with a receipt), but blocks are first-party only during preview.
+#
+# Do NOT set `entrypoint:` — navig only runs .py/.js entrypoints. These commands
+# instead use navig's raw-shell path: a `syntax:` that does not start with "navig "
+# is executed with shell=True in the skill's own directory, which is where the
+# vendored .bat lives.
+
+name: Multiplicity Purge
+description: Remove Stardock/EdgeRunner Multiplicity 2/3/4 leftovers - service, folders, registry keys and firewall rules - with a dry run and a verification pass
+version: 2.1.0
+category: system
+license: MIT
+author: miztizm
+
+user_invocable: true
+risk_level: destructive
+
+commands:
+  - name: status
+    syntax: purge-multiplicity.bat --status
+    description: Read-only report - version, service state, Primary/Secondary role, bound ports, live peers, firewall rules, licence
+    risk: safe
+
+  - name: dry-run
+    syntax: purge-multiplicity.bat --dry-run --no-pause
+    description: Print every action a purge would take; changes nothing, needs no admin
+    risk: safe
+
+  - name: purge
+    syntax: purge-multiplicity.bat --yes --no-pause
+    description: Elevate, stop and delete the service, kill processes, remove leftover folders, registry keys and firewall rules, then verify
+    risk: destructive
+    # SKILL_STANDARD.md documents this field as `confirmation:`; the loader in
+    # core/navig/commands/skills.py reads `confirmation_msg`. Both are set so the
+    # custom prompt survives either reading.
+    confirmation: "This removes Multiplicity services, folders, registry keys and firewall rules. No undo. Run dry-run first?"
+    confirmation_msg: "This removes Multiplicity services, folders, registry keys and firewall rules. No undo. Run dry-run first?"
+
+examples:
+  - title: Am I actually using Multiplicity?
+    user: Is Multiplicity doing anything on this machine?
+    command: navig skill run purge-multiplicity:status
+
+  - title: What would a cleanup remove?
+    user: What Multiplicity leftovers could I clean up?
+    command: navig skill run purge-multiplicity:dry-run
+
+  - title: Purge it
+    user: Purge the Multiplicity leftovers
+    command: navig skill run purge-multiplicity:purge
+
+agent_hints:
+  when_to_use: >-
+    Use when the user wants to remove or clean up Stardock Multiplicity or EdgeRunner
+    Multiplicity, or reports a failed uninstall, a service that will not stop, an installer that
+    claims the product is still installed, or leftover firewall rules. Trigger on "uninstall
+    multiplicity", "remove multiplicity", "multiplicity service", "purge multiplicity".
+  output_format: >-
+    status and dry-run print a plain-text report (version, role, ports, peers, candidate
+    actions). purge prints one line per action plus a summary: removed / skipped / failed and
+    the log path.
+  follow_up: >-
+    Always run status or dry-run before purge. Warn the user if the role flag is PRIMARY or a
+    peer is connected - purging then disconnects other machines. After a purge, offer a reboot.
+
+platforms:
+  - windows

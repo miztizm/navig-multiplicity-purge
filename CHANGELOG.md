@@ -3,6 +3,36 @@
 All notable changes to this project. Format: [Keep a Changelog](https://keepachangelog.com/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.2.0] — 2026-10-17
+
+NAVIG skill packaging. The tool is unchanged (still 2.1.0); this release adds a tested,
+installable skill around it. **Not submitted to the official registry** — installable straight
+from this repo.
+
+### Added
+- `navig-skill/cli-skills/system/purge-multiplicity/` — `SKILL.md` (the form navig discovers),
+  the registry-submission `purge-multiplicity.yaml`, and a vendored `purge-multiplicity.bat`.
+  Commands: `status` (safe), `dry-run` (safe), `purge` (destructive, with a confirmation message).
+- `navig-skill/test_skill.py` — 72 static checks + a 3-assertion behavioural run that executes the
+  payload exactly the way navig does (`shell=True`, `cwd` = skill directory). `--live` enables it.
+- `navig-skill/registry-entry.json` — the object to paste into `cli-skills/registry.json`.
+- CI step running the static checks, including a byte-identical check that the vendored payload
+  cannot drift from the root script.
+
+### Discovered in navig 3.27.1 (documented in `navig-skill/README.md`)
+- **Three different key spellings for one field.** The runtime (`core/navig/commands/skills.py`)
+  reads `risk-level`; `SKILL_STANDARD.md` documents `risk_level`; `navig skill validate` reads
+  `safety`. Setting only one leaves a destructive skill silently `safe` on the other paths — the
+  skill now sets all three and a test pins them together.
+- **A folder named `navig/` shadows the installed `navig` package** for anything run from the repo
+  root, crashing its CLI with `ImportError: cannot import name '__version__'`. Hence `navig-skill/`.
+- **`navig skill validate` / `list --dir` fail on relative paths** and succeed on absolute ones.
+- `entrypoint:` only accepts `.py`/`.js`, so a `.bat` payload must use the raw-shell command path
+  (a `syntax:` that does not start with `navig `), which runs with `cwd` = the skill directory.
+
+### Fixed
+- Nothing in the tool itself.
+
 ## [2.1.0] — 2026-10-17
 
 Research pass plus a read-only diagnostic mode. Verified against **Multiplicity 4.0.7.2** on
