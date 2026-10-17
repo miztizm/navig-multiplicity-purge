@@ -3,6 +3,32 @@
 All notable changes to this project. Format: [Keep a Changelog](https://keepachangelog.com/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.1.0] — 2026-10-17
+
+Research pass plus a read-only diagnostic mode. Verified against **Multiplicity 4.0.7.2** on
+Windows 11 — see [docs/background.md](docs/background.md).
+
+### Added
+- **`--status` / `-s`** — read-only report: installed version, service state and path, the
+  `Primary` role flag with a plain-English interpretation, bound ports, live peers, how many of the
+  four feature firewall rules exist, licence presence, IDD driver presence, uninstaller presence.
+  Answers "am I actually using this?" without changing anything. No admin needed.
+- `docs/background.md` — what Multiplicity is, its version lines, every component it installs, the
+  documented port map, and the five concrete reasons an uninstall leaves residue. Sourced from
+  Stardock's product/support pages and verified on a live install.
+- Kill list extended with the actual MP4 binaries: `Multipl2_64.exe`, `Multipl2_A64.exe`,
+  `Mp2control_64.exe`, `Mp2control_A64.exe`, `MP32.exe`, `MP64.exe`, `MultiPLVA64.exe`,
+  `MultiSrv32.exe`, `MultiSrvA64.exe`, `MPRDP.exe`, `MPRDISP.exe`, `MPRDISP64.exe`,
+  `EventFilter.exe`, `DeElevate.exe`.
+
+### Changed
+- README: new "Am I actually using it?" section, background link, updated verification numbers
+  (25 actions / 98 skipped on the reference machine).
+
+### Notes
+- `EventFilter.exe` is killed because it lives in the Multiplicity folder and can hold it open;
+  it is not a service and is not removed from any other product's folder.
+
 ## [2.0.0] — 2026-10-17
 
 First public release. A one-off cleanup script rewritten as a maintainable tool.

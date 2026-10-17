@@ -15,17 +15,18 @@ title purge-multiplicity
 ::  those leftovers. Every destructive action goes through one guarded helper,
 ::  so --dry-run can never touch the machine.
 ::
-::  Usage: purge-multiplicity.bat [--dry-run] [--yes] [--no-pause] [--log PATH]
+::  Usage: purge-multiplicity.bat [--dry-run] [--status] [--yes] [--no-pause] [--log PATH]
 ::         purge-multiplicity.bat --help
 :: ===========================================================================
 
 set "APP=purge-multiplicity"
-set "VER=2.0.0"
+set "VER=2.1.0"
 set "AUTHOR=miztizm"
 
 set "DRY=0"
 set "ASSUME=0"
 set "NOPAUSE=0"
+set "STATUS=0"
 set "REBOOT_PROMPT=1"
 set "LOG=%TEMP%\purge-multiplicity.log"
 set "REMOVED=0"
@@ -41,6 +42,8 @@ if /I "%~1"=="-h"          goto usage
 if /I "%~1"=="/?"          goto usage
 if /I "%~1"=="--dry-run"   ( set "DRY=1" & shift & goto parse )
 if /I "%~1"=="-n"          ( set "DRY=1" & shift & goto parse )
+if /I "%~1"=="--status"    ( set "STATUS=1" & shift & goto parse )
+if /I "%~1"=="-s"          ( set "STATUS=1" & shift & goto parse )
 if /I "%~1"=="--yes"       ( set "ASSUME=1" & shift & goto parse )
 if /I "%~1"=="-y"          ( set "ASSUME=1" & shift & goto parse )
 if /I "%~1"=="--no-pause"  ( set "NOPAUSE=1" & set "REBOOT_PROMPT=0" & shift & goto parse )
@@ -52,6 +55,7 @@ goto usage
 
 :args_done
 if "%LOG%"=="" set "LOG=%TEMP%\purge-multiplicity.log"
+if "%STATUS%"=="1" goto status_mode
 
 :: ------------------------------------------------------------------ startup
 echo ===========================================================================
@@ -127,9 +131,12 @@ for %%S in (
 
 echo [2/9] Ending processes...
 for %%P in (
-  multipl.exe multipl2.exe MultiPLV64.exe MP2Drag.exe MP2Control.exe MPBar.exe
-  MultiplicityConfig.exe MultiSrv.exe MultiSrv64.exe MPRDP64.exe SdDisplay.exe
-  DeElevate64.exe Multiplicity.exe
+  multipl.exe multipl2.exe Multipl2_64.exe Multipl2_A64.exe MultiPLV64.exe MultiPLVA64.exe
+  MP2Drag.exe MP2Control.exe Mp2control_64.exe Mp2control_A64.exe MPBar.exe MP32.exe MP64.exe
+  MultiplicityConfig.exe EventFilter.exe
+  MultiSrv.exe MultiSrv32.exe MultiSrv64.exe MultiSrvA64.exe
+  MPRDP.exe MPRDP64.exe MPRDISP.exe MPRDISP64.exe
+  SdDisplay.exe DeElevate.exe DeElevate64.exe Multiplicity.exe
 ) do call :KillProc %%P
 
 echo [3/9] Removing scheduled tasks...
@@ -469,6 +476,68 @@ echo   verification is only meaningful after a live run.
 call :log "verify leftovers=!LEFT!"
 exit /b 0
 
+:: ================================================================== status ==
+:: Read-only. Answers: is it installed, and what is this PC doing with it?
+:status_mode
+echo.
+echo  --- status ---------------------------------------------------------------
+set "VERSTR=(not installed)"
+for /f "tokens=2,*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Stardock Multiplicity" /v DisplayVersion 2^>nul ^| findstr /I "DisplayVersion"') do set "VERSTR=%%B"
+echo   version     : !VERSTR!
+
+sc.exe query Multiplicity >nul 2>&1
+if not "!errorlevel!"=="0" goto status_nosvc
+for /f "tokens=3,4" %%A in ('sc.exe query Multiplicity ^| findstr /I "STATE"') do echo   service     : %%B
+echo   service exe : C:\Program Files (x86)\Stardock\Multiplicity\Multisrv64.exe
+goto status_role
+
+:status_nosvc
+echo   service     : not present
+
+:status_role
+set "PRIM=(unknown)"
+for /f "tokens=3" %%A in ('reg query "HKLM\Software\Stardock\Multiplicity2\MP\MP" /v Primary 2^>nul ^| findstr /I "Primary"') do set "PRIM=%%A"
+echo   role flag   : Primary=!PRIM!
+if /I "!PRIM!"=="0x0" echo   interpreted : SECONDARY - another PC drives this one's keyboard and mouse
+if /I "!PRIM!"=="0x1" echo   interpreted : PRIMARY   - this PC shares its input out to secondary PCs
+
+echo   listening   :
+set "LSN=0"
+for /f "tokens=*" %%L in ('netstat -ano 2^>nul ^| findstr /R ":3056[0-9]" ^| findstr /I "LISTENING"') do (
+  set "LSN=1"
+  echo    %%L
+)
+if "!LSN!"=="0" echo    (none)
+
+echo   peers       :
+set "PEER=0"
+for /f "tokens=*" %%L in ('netstat -ano 2^>nul ^| findstr /R ":3056[0-9]" ^| findstr /I "ESTABLISHED"') do (
+  set "PEER=1"
+  echo    %%L
+)
+if "!PEER!"=="0" echo    (none - no peer connected right now)
+
+set "FW=0"
+for %%R in ("Multiplicity Service" "Multiplicity Clipboard" "Multiplicity Audio Service" "Multiplicity Remote Screen Service") do (
+  netsh advfirewall firewall show rule name=%%R >nul 2>&1
+  if "!errorlevel!"=="0" set /a FW+=1
+)
+echo   firewall    : !FW! of 4 feature rules present
+echo   (service / clipboard / audio / remote-screen; absence means that feature is off)
+
+set "LIC=absent"
+if exist "C:\ProgramData\Stardock\Multiplicity\License.sig" set "LIC=present"
+echo   license     : !LIC!
+set "IDD=absent"
+if exist "C:\Program Files (x86)\Stardock\Multiplicity\MultiplicityIddDriver" set "IDD=present"
+echo   idd driver  : !IDD! (indirect display driver, MP4)
+set "UNINST=absent"
+if exist "C:\Program Files (x86)\Stardock\Multiplicity\uninstall.exe" set "UNINST=present"
+echo   uninstaller : !UNINST!
+echo ---------------------------------------------------------------------------
+echo  Nothing was changed. Use --dry-run to see what a purge would remove.
+exit /b 0
+
 :usage
 echo.
 echo %APP% v%VER% - remove Stardock / EdgeRunner Multiplicity 2/3/4 leftovers
@@ -476,6 +545,7 @@ echo.
 echo   purge-multiplicity.bat [options]
 echo.
 echo   --dry-run, -n    show what would be removed; change nothing (safe, no admin needed)
+echo   --status, -s     report what is installed and how this PC is using it; change nothing
 echo   --yes, -y        skip the interactive PURGE confirmation (for scripting)
 echo   --no-pause       do not wait for a keypress at the end
 echo   --no-reboot      do not offer to reboot at the end
