@@ -1,6 +1,6 @@
 # Removal map
 
-Exactly what `purge-multiplicity.bat` targets, and — just as important — what it refuses to touch.
+Exactly what `multiplicity-purge.bat` targets, and — just as important — what it refuses to touch.
 
 ## Services
 

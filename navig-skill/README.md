@@ -1,7 +1,7 @@
 # NAVIG skill packaging
 
 This folder holds a **ready-to-submit** [NAVIG](https://github.com/navig-run/registry) skill for
-`purge-multiplicity`, kept here so the tool and its skill packaging cannot drift apart.
+`multiplicity-purge`, kept here so the tool and its skill packaging cannot drift apart.
 
 **Status: not submitted to the official registry.** Nothing in this folder is published to
 `navig-run/registry`; it is a local, installable package. Submitting is a separate decision —
@@ -11,10 +11,10 @@ see [Publishing](#publishing) below.
 navig-skill/
 ├── test_skill.py                                  # static + behavioural checks
 ├── registry-entry.json                            # snippet for cli-skills/registry.json
-└── cli-skills/system/purge-multiplicity/
+└── cli-skills/system/multiplicity-purge/
     ├── SKILL.md                                   # what navig discovers and runs
-    ├── purge-multiplicity.yaml                    # registry submission form
-    └── purge-multiplicity.bat                     # vendored payload (byte-identical to root)
+    ├── multiplicity-purge.yaml                    # registry submission form
+    └── multiplicity-purge.bat                     # vendored payload (byte-identical to root)
 ```
 
 ## Why a cli-skill, and why this shape
@@ -29,7 +29,7 @@ Three details come from reading `core/navig-skill/commands/skills.py` rather tha
 |---|---|
 | Skills are discovered by `rglob("SKILL.md")`; category = first path segment | `SKILL.md` is the real artifact, `cli-skills/system/` is the category |
 | Only `.py`/`.js` may be `entrypoint:` | No `entrypoint:` — commands use the raw-shell path instead |
-| A `syntax:` not starting with `navig ` runs as `shell=True` with **cwd = the skill directory** | `purge-multiplicity.bat` lives beside `SKILL.md`; no download, no PATH dependency |
+| A `syntax:` not starting with `navig ` runs as `shell=True` with **cwd = the skill directory** | `multiplicity-purge.bat` lives beside `SKILL.md`; no download, no PATH dependency |
 
 Two documented-but-not-implemented field names are also handled: the loader reads `risk-level`,
 `user-invocable` and `confirmation_msg` (hyphenated / suffixed), while `SKILL_STANDARD.md`
@@ -41,26 +41,26 @@ survives either path.
 
 ```bash
 # from GitHub (works once the commit is pushed)
-python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity
+python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
 
 # or from a local checkout
-python -m navig install add navig-skill/cli-skills/system/purge-multiplicity
+python -m navig install add navig-skill/cli-skills/system/multiplicity-purge
 ```
 
 Then:
 
 ```bash
 STORE="$HOME/.navig/data/store/skills"      # where navig installs skills
-python -m navig skill list --dir "$STORE"   # should show purge-multiplicity
-python -m navig skill run purge-multiplicity:status  --dir "$STORE"
-python -m navig skill run purge-multiplicity:dry-run --dir "$STORE"
-python -m navig skill run purge-multiplicity:purge   --dir "$STORE"   # destructive; prompts first
+python -m navig skill list --dir "$STORE"   # should show multiplicity-purge
+python -m navig skill run multiplicity-purge:status  --dir "$STORE"
+python -m navig skill run multiplicity-purge:dry-run --dir "$STORE"
+python -m navig skill run multiplicity-purge:purge   --dir "$STORE"   # destructive; prompts first
 ```
 
 Remove it again:
 
 ```bash
-python -m navig install remove purge-multiplicity
+python -m navig install remove multiplicity-purge
 python -m navig install list                # confirm it is gone
 ```
 
@@ -74,22 +74,22 @@ python -m navig install list                # confirm it is gone
 On navig 3.27.1 / Windows 11, against the public repo:
 
 ```
-$ python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity
-  > Installed skill 'purge-multiplicity' -> C:\Users\...\.navig\data\store\skills\purge-multiplicity
+$ python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
+  > Installed skill 'multiplicity-purge' -> C:\Users\...\.navig\data\store\skills\multiplicity-purge
 
-$ ls <store>/purge-multiplicity
-  SKILL.md   purge-multiplicity.yaml   purge-multiplicity.bat     # payload travelled with it
+$ ls <store>/multiplicity-purge
+  SKILL.md   multiplicity-purge.yaml   multiplicity-purge.bat     # payload travelled with it
 
-$ python -m navig skill run purge-multiplicity:status --dir <store>/skills
-  > purge-multiplicity.bat --status
+$ python -m navig skill run multiplicity-purge:status --dir <store>/skills
+  > multiplicity-purge.bat --status
    version 4.0.7.2 · service RUNNING · role flag Primary=0 · peers: 192.168.1.13:30564 ...
 
-$ python -m navig skill run purge-multiplicity:dry-run --dir <store>/skills
+$ python -m navig skill run multiplicity-purge:dry-run --dir <store>/skills
    Actions that WOULD run: 25   Skipped: 98   Would fail: 0
 
-$ python -m navig install remove purge-multiplicity
-  > Removed 'purge-multiplicity'
-$ test -d <store>/purge-multiplicity    # False — clean removal, nothing left behind
+$ python -m navig install remove multiplicity-purge
+  > Removed 'multiplicity-purge'
+$ test -d <store>/multiplicity-purge    # False — clean removal, nothing left behind
 ```
 
 ## Test it
@@ -99,18 +99,18 @@ python navig-skill/test_skill.py           # static: frontmatter, YAML, agreemen
 python navig-skill/test_skill.py --live    # also runs the payload the way navig does
 ```
 
-`--live` runs `purge-multiplicity.bat --status` with `shell=True` and `cwd` set to the skill
+`--live` runs `multiplicity-purge.bat --status` with `shell=True` and `cwd` set to the skill
 directory — the same dispatch as `_invoke_shell` — and requires exit 0 plus a real status report.
 It is read-only, and it works whether or not Multiplicity is installed.
 
 CI runs the static form on every push, including the byte-identical payload check, so the vendored
-copy can never silently drift from `../purge-multiplicity.bat`.
+copy can never silently drift from `../multiplicity-purge.bat`.
 
 ## Publishing
 
 Not done, and not required for the tool to be useful. When you do want it in the official registry:
 
-1. Copy `cli-skills/system/purge-multiplicity.yaml` **and** `purge-multiplicity.bat` into
+1. Copy `cli-skills/system/multiplicity-purge.yaml` **and** `multiplicity-purge.bat` into
    `navig-run/registry` at `cli-skills/system/`.
 2. Add the entry from `registry-entry.json` to `cli-skills/registry.json`.
 3. PR with the note that the payload is resolved via the skill's working directory.

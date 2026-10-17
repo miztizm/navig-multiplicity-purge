@@ -1,9 +1,9 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
-title purge-multiplicity
+title multiplicity-purge
 
 :: ===========================================================================
-::  purge-multiplicity  -  unofficial cleaner for Stardock / EdgeRunner
+::  multiplicity-purge  -  unofficial cleaner for Stardock / EdgeRunner
 ::                         Multiplicity 2 / 3 / 4 leftovers
 ::
 ::  Author : miztizm
@@ -15,11 +15,11 @@ title purge-multiplicity
 ::  those leftovers. Every destructive action goes through one guarded helper,
 ::  so --dry-run can never touch the machine.
 ::
-::  Usage: purge-multiplicity.bat [--dry-run] [--status] [--yes] [--no-pause] [--log PATH]
-::         purge-multiplicity.bat --help
+::  Usage: multiplicity-purge.bat [--dry-run] [--status] [--yes] [--no-pause] [--log PATH]
+::         multiplicity-purge.bat --help
 :: ===========================================================================
 
-set "APP=purge-multiplicity"
+set "APP=multiplicity-purge"
 set "VER=2.1.0"
 set "AUTHOR=miztizm"
 
@@ -28,7 +28,7 @@ set "ASSUME=0"
 set "NOPAUSE=0"
 set "STATUS=0"
 set "REBOOT_PROMPT=1"
-set "LOG=%TEMP%\purge-multiplicity.log"
+set "LOG=%TEMP%\multiplicity-purge.log"
 set "REMOVED=0"
 set "SKIPPED=0"
 set "FAILED=0"
@@ -54,7 +54,7 @@ echo.
 goto usage
 
 :args_done
-if "%LOG%"=="" set "LOG=%TEMP%\purge-multiplicity.log"
+if "%LOG%"=="" set "LOG=%TEMP%\multiplicity-purge.log"
 if "%STATUS%"=="1" goto status_mode
 
 :: ------------------------------------------------------------------ startup
@@ -269,7 +269,7 @@ echo.
 choice /C YN /N /M "  Reboot now to finish the purge? [Y/N] "
 if errorlevel 2 goto reboot_skip
 echo  Rebooting in 10 seconds. Run "shutdown /a" to cancel.
-shutdown /r /t 10 /c "purge-multiplicity: finishing cleanup"
+shutdown /r /t 10 /c "multiplicity-purge: finishing cleanup"
 goto no_reboot
 
 :reboot_skip
@@ -542,20 +542,20 @@ exit /b 0
 echo.
 echo %APP% v%VER% - remove Stardock / EdgeRunner Multiplicity 2/3/4 leftovers
 echo.
-echo   purge-multiplicity.bat [options]
+echo   multiplicity-purge.bat [options]
 echo.
 echo   --dry-run, -n    show what would be removed; change nothing (safe, no admin needed)
 echo   --status, -s     report what is installed and how this PC is using it; change nothing
 echo   --yes, -y        skip the interactive PURGE confirmation (for scripting)
 echo   --no-pause       do not wait for a keypress at the end
 echo   --no-reboot      do not offer to reboot at the end
-echo   --log PATH       write the log somewhere else (default: %%TEMP%%\purge-multiplicity.log)
+echo   --log PATH       write the log somewhere else (default: %%TEMP%%\multiplicity-purge.log)
 echo   --help, -h       this text
 echo.
 echo   Examples:
-echo     purge-multiplicity.bat --dry-run
-echo     purge-multiplicity.bat
-echo     purge-multiplicity.bat --yes --no-reboot
+echo     multiplicity-purge.bat --dry-run
+echo     multiplicity-purge.bat
+echo     multiplicity-purge.bat --yes --no-reboot
 echo.
 echo   No undo. Create a restore point first. MIT licensed. Not affiliated with
 echo   Stardock or EdgeRunner.

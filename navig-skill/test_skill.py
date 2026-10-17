@@ -11,7 +11,7 @@ Static checks (always run):
     ASCII-only and CRLF (cmd.exe misparses LF-only batch files)
 
 Behavioural check (only with --live, and only if Multiplicity is present):
-  * runs `purge-multiplicity.bat --status` exactly the way navig does it —
+  * runs `multiplicity-purge.bat --status` exactly the way navig does it —
     shell=True with cwd = the skill directory — and requires exit 0 plus a
     recognisable status report
 
@@ -33,11 +33,11 @@ except ImportError:  # pragma: no cover
     sys.exit("PyYAML is required: python -m pip install pyyaml")
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL_DIR = ROOT / "navig-skill" / "cli-skills" / "system" / "purge-multiplicity"
+SKILL_DIR = ROOT / "navig-skill" / "cli-skills" / "system" / "multiplicity-purge"
 SKILL_MD = SKILL_DIR / "SKILL.md"
-SKILL_YAML = SKILL_DIR / "purge-multiplicity.yaml"
-PAYLOAD = SKILL_DIR / "purge-multiplicity.bat"
-ROOT_BAT = ROOT / "purge-multiplicity.bat"
+SKILL_YAML = SKILL_DIR / "multiplicity-purge.yaml"
+PAYLOAD = SKILL_DIR / "multiplicity-purge.bat"
+ROOT_BAT = ROOT / "multiplicity-purge.bat"
 
 VALID_CATEGORIES = {
     "network", "system", "cloud", "docker", "database", "security",
@@ -145,7 +145,7 @@ def static() -> None:
           "top-level risk matches")
 
     print("\npayload")
-    check(PAYLOAD.is_file(), "purge-multiplicity.bat sits beside SKILL.md (cwd for navig)")
+    check(PAYLOAD.is_file(), "multiplicity-purge.bat sits beside SKILL.md (cwd for navig)")
     check(ROOT_BAT.is_file(), "root script present")
     check(sha256(PAYLOAD) == sha256(ROOT_BAT),
           "vendored payload is byte-identical to the root script")
@@ -162,7 +162,7 @@ def live() -> None:
     print("\nbehavioural check (navig execution model: shell=True, cwd=skill dir)")
     # Exactly what core/navig/commands/skills.py:_invoke_shell does for a command
     # whose syntax does not start with "navig ".
-    cmd = "purge-multiplicity.bat --status"
+    cmd = "multiplicity-purge.bat --status"
     try:
         proc = subprocess.run(  # noqa: S602 - mirrors navig's own dispatch
             cmd, shell=True, cwd=str(SKILL_DIR), text=True,

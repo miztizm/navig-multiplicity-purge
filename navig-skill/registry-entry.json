@@ -1,11 +1,11 @@
 {
-  "id": "purge-multiplicity",
+  "id": "multiplicity-purge",
   "category": "system",
-  "file": "system/purge-multiplicity.yaml",
+  "file": "system/multiplicity-purge.yaml",
   "description": "Remove Stardock/EdgeRunner Multiplicity 2/3/4 leftovers - service, folders, registry keys and firewall rules - with a dry run and a verification pass",
   "commands": ["status", "dry-run", "purge"],
   "version": "2.1.0",
   "risk_level": "destructive",
-  "install": "navig skill install github:navig-run/registry/cli-skills/system/purge-multiplicity",
-  "_note": "Paste this object into the `skills` array of cli-skills/registry.json in navig-run/registry, and place purge-multiplicity.yaml + purge-multiplicity.bat in cli-skills/system/. Not submitted yet."
+  "install": "navig skill install github:navig-run/registry/cli-skills/system/multiplicity-purge",
+  "_note": "Paste this object into the `skills` array of cli-skills/registry.json in navig-run/registry, and place multiplicity-purge.yaml + multiplicity-purge.bat in cli-skills/system/. Not submitted yet."
 }

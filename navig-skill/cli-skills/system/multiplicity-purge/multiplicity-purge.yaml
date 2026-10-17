@@ -1,7 +1,7 @@
-# NAVIG Registry submission form — cli-skills/system/purge-multiplicity.yaml
+# NAVIG Registry submission form — cli-skills/system/multiplicity-purge.yaml
 #
 # This is the file to PR into github.com/navig-run/registry at
-# `cli-skills/system/purge-multiplicity.yaml`, with `purge-multiplicity.bat`
+# `cli-skills/system/multiplicity-purge.yaml`, with `multiplicity-purge.bat`
 # placed beside it.
 #
 # Why a cli-skill: the registry defines cli-skills as "YAML command skills for one
@@ -26,17 +26,17 @@ risk_level: destructive
 
 commands:
   - name: status
-    syntax: purge-multiplicity.bat --status
+    syntax: multiplicity-purge.bat --status
     description: Read-only report - version, service state, Primary/Secondary role, bound ports, live peers, firewall rules, licence
     risk: safe
 
   - name: dry-run
-    syntax: purge-multiplicity.bat --dry-run --no-pause
+    syntax: multiplicity-purge.bat --dry-run --no-pause
     description: Print every action a purge would take; changes nothing, needs no admin
     risk: safe
 
   - name: purge
-    syntax: purge-multiplicity.bat --yes --no-pause
+    syntax: multiplicity-purge.bat --yes --no-pause
     description: Elevate, stop and delete the service, kill processes, remove leftover folders, registry keys and firewall rules, then verify
     risk: destructive
     # SKILL_STANDARD.md documents this field as `confirmation:`; the loader in
@@ -48,15 +48,15 @@ commands:
 examples:
   - title: Am I actually using Multiplicity?
     user: Is Multiplicity doing anything on this machine?
-    command: navig skill run purge-multiplicity:status
+    command: navig skill run multiplicity-purge:status
 
   - title: What would a cleanup remove?
     user: What Multiplicity leftovers could I clean up?
-    command: navig skill run purge-multiplicity:dry-run
+    command: navig skill run multiplicity-purge:dry-run
 
   - title: Purge it
     user: Purge the Multiplicity leftovers
-    command: navig skill run purge-multiplicity:purge
+    command: navig skill run multiplicity-purge:purge
 
 agent_hints:
   when_to_use: >-

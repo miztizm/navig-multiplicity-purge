@@ -13,7 +13,7 @@ jobs:
       - name: Batch file must be ASCII-only with CRLF line endings
         shell: pwsh
         run: |
-          $path = 'purge-multiplicity.bat'
+          $path = 'multiplicity-purge.bat'
           if (-not (Test-Path $path)) { throw "$path is missing" }
           $bytes = [System.IO.File]::ReadAllBytes($path)
 
@@ -37,7 +37,7 @@ jobs:
       - name: Every mutating helper must carry the dry-run guard
         shell: pwsh
         run: |
-          $lines = Get-Content 'purge-multiplicity.bat'
+          $lines = Get-Content 'multiplicity-purge.bat'
           $helpers = @(':StopService', ':DelService', ':KillProc', ':RunUninstaller',
                        ':RmDir', ':DelFile', ':DelMask', ':RegDel',
                        ':DelTasksMatching', ':DelFirewall')

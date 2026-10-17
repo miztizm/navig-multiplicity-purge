@@ -99,7 +99,7 @@ after an upgrade or partial uninstall ([service is failing / crashing](https://s
 
 ## Should you purge at all?
 
-Run `purge-multiplicity.bat --status` first. It prints the version, service state, role flag, bound
+Run `multiplicity-purge.bat --status` first. It prints the version, service state, role flag, bound
 ports, live peers, firewall rules and licence presence — read-only.
 
 - **`Primary=0x1`** → this PC is a primary; other machines depend on it. Purging disconnects them.

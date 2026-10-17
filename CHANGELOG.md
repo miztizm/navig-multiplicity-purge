@@ -3,6 +3,23 @@
 All notable changes to this project. Format: [Keep a Changelog](https://keepachangelog.com/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.2.2] — 2026-10-17
+
+Naming consistency. No functional change — the tool is still 2.1.0.
+
+### Changed
+- **Skill id** `purge-multiplicity` → **`multiplicity-purge`**, matching the repo, the script and the
+  registry's noun-first house style (`git-ops`, `docker-ops`, `network-scan`, `system-health`). The
+  folder, YAML filename, `SKILL.md` `name:`, all three examples and the install spec now agree.
+- **Script** `purge-multiplicity.bat` → **`multiplicity-purge.bat`**, together with its internal
+  `APP`/`title`/log filename, so no layer keeps the old inverted order.
+- Install spec is now:
+  `github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge`
+
+### Note
+- The v2.1.0 release asset keeps its original filename `purge-multiplicity.bat`; everything from
+  v2.2.2 onward ships `multiplicity-purge.bat`. Historical entries below are left as they shipped.
+
 ## [2.2.1] — 2026-10-17
 
 Verified the full install → run → remove cycle against the public repo, and documented what it

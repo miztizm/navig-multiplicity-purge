@@ -1,5 +1,5 @@
 ---
-name: purge-multiplicity
+name: multiplicity-purge
 description: >-
   Remove Stardock/EdgeRunner Multiplicity 2/3/4 leftovers - service, folders, registry keys and
   firewall rules - with a dry run first and a verification pass after. Use when the user says
@@ -22,28 +22,28 @@ safety: destructive
 platforms: [windows]
 navig-commands:
   - name: status
-    syntax: purge-multiplicity.bat --status
+    syntax: multiplicity-purge.bat --status
     description: Read-only report - version, service state, Primary/Secondary role, bound ports, live peers, firewall rules, licence
     risk: safe
   - name: dry-run
-    syntax: purge-multiplicity.bat --dry-run --no-pause
+    syntax: multiplicity-purge.bat --dry-run --no-pause
     description: Print every action a purge would take; changes nothing, needs no admin
     risk: safe
   - name: purge
-    syntax: purge-multiplicity.bat --yes --no-pause
+    syntax: multiplicity-purge.bat --yes --no-pause
     description: Elevate, stop and delete the service, kill processes, remove leftover folders, registry keys and firewall rules, then verify
     risk: destructive
     confirmation_msg: "This removes Multiplicity services, folders, registry keys and firewall rules. No undo. Run dry-run first?"
 examples:
   - title: Am I actually using Multiplicity?
     user: Is Multiplicity doing anything on this machine?
-    command: navig skill run purge-multiplicity:status
+    command: navig skill run multiplicity-purge:status
   - title: What would a cleanup remove?
     user: What Multiplicity leftovers could I clean up?
-    command: navig skill run purge-multiplicity:dry-run
+    command: navig skill run multiplicity-purge:dry-run
   - title: Purge it
     user: Purge the Multiplicity leftovers
-    command: navig skill run purge-multiplicity:purge
+    command: navig skill run multiplicity-purge:purge
 agent_hints:
   when_to_use: >-
     Use when the user wants to remove or clean up Stardock Multiplicity or EdgeRunner
@@ -59,7 +59,7 @@ agent_hints:
     peer is connected - purging then disconnects other machines. After a purge, offer a reboot.
 ---
 
-# purge-multiplicity
+# multiplicity-purge
 
 Unofficial cleaner for **Stardock / EdgeRunner Multiplicity 2, 3 and 4** leftovers. Multiplicity's
 own uninstaller regularly leaves the service running, ghost `CurrentControlSet\Services` keys, an
@@ -82,8 +82,8 @@ Full product notes, the port map and the reasons residue survives:
 1. **`status` before `purge`, always.** If it reports `PRIMARY` or a connected peer, other machines
    are using this one — purging disconnects them mid-session.
 2. **The payload runs from this directory.** navig executes the command with the skill's own folder
-   as the working directory, so `purge-multiplicity.bat` must sit beside `SKILL.md` (it does — see
-   `purge-multiplicity.bat` in this folder). No network access, nothing to download at run time.
+   as the working directory, so `multiplicity-purge.bat` must sit beside `SKILL.md` (it does — see
+   `multiplicity-purge.bat` in this folder). No network access, nothing to download at run time.
 
 ## Licence
 

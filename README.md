@@ -7,7 +7,7 @@ service survives, `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Multipli
 ProgramData keeps its session data, and the firewall keeps the rules. Windows then refuses to
 reinstall, or the installer insists the product is "already installed".
 
-`purge-multiplicity` removes exactly those leftovers, logs every action, and refuses to touch
+`multiplicity-purge` removes exactly those leftovers, logs every action, and refuses to touch
 anything else.
 
 ```
@@ -23,13 +23,13 @@ anything else.
 
 ```cmd
 :: 1. See exactly what would be removed. Changes nothing. No admin needed.
-purge-multiplicity.bat --dry-run
+multiplicity-purge.bat --dry-run
 
 :: 2. Run it (asks for confirmation, then self-elevates)
-purge-multiplicity.bat
+multiplicity-purge.bat
 
 :: 3. Unattended, e.g. from a provisioning script
-purge-multiplicity.bat --yes --no-reboot --log C:\logs\mp-purge.log
+multiplicity-purge.bat --yes --no-reboot --log C:\logs\mp-purge.log
 ```
 
 Requirements: Windows 10/11, `cmd.exe`. Admin rights for a live run (the script re-launches
@@ -41,7 +41,7 @@ Before removing anything, ask the machine. `--status` is read-only and prints wh
 doing right now — role, peers, ports:
 
 ```cmd
-purge-multiplicity.bat --status
+multiplicity-purge.bat --status
 ```
 
 ```
@@ -82,7 +82,7 @@ Read it like this:
 | `--yes`, `-y` | Skip the interactive `PURGE` confirmation (for scripting). |
 | `--no-pause` | Do not wait for a keypress at the end. |
 | `--no-reboot` | Do not offer the reboot at the end. |
-| `--log PATH` | Write the log elsewhere (default `%TEMP%\purge-multiplicity.log`). |
+| `--log PATH` | Write the log elsewhere (default `%TEMP%\multiplicity-purge.log`). |
 | `--help`, `-h` | Usage. |
 
 Exit codes: `0` success · `1` aborted by you · `2` elevation refused · `3` at least one action failed.
@@ -114,7 +114,7 @@ The script is not "careful by vibes" — it is careful by construction:
    software. The only wildcard is the `Registrations\mp*.bin` cleanup inside Multiplicity's own
    ProgramData folder.
 4. **Confirmation by typing `PURGE`.** A stray Enter does nothing.
-5. **Log first, always.** `%TEMP%\purge-multiplicity.log` with a timestamp per action.
+5. **Log first, always.** `%TEMP%\multiplicity-purge.log` with a timestamp per action.
 
 **No undo.** Make a restore point (`SystemPropertiesProtection.exe`) or a VM snapshot first if the
 machine matters. The script is written to be readable precisely so you can audit it before running
@@ -152,9 +152,9 @@ This repo also ships a ready-to-install [NAVIG](https://github.com/navig-run/reg
 registry** — it is packaged here and installable directly from this repo:
 
 ```bash
-python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/purge-multiplicity
-python -m navig skill run purge-multiplicity:status
-python -m navig install remove purge-multiplicity
+python -m navig skill install github:miztizm/multiplicity-purge/navig-skill/cli-skills/system/multiplicity-purge
+python -m navig skill run multiplicity-purge:status
+python -m navig install remove multiplicity-purge
 ```
 
 Packaging notes, the pillar rationale and the three frontmatter spellings navig disagrees with
